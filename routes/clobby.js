@@ -6,16 +6,18 @@ const clManager = require('../managers/clobby');
 router.post('/fetchInformation', (req, res)=>{
     console.log("[!] Routing @ /fetchInformation")
     const {
-        type
+        type,
+        cycle
     } = req.body;
 
     if(!validateContent(type)){
         return res.status(400).send({message:"Wrong Request"});
     }
-    clManager.fetch(type).then((result)=>{
+    clManager.fetch(type, cycle).then((result)=>{
         res.status(200).send(result)
     }, (error) =>{
-        res.status(error.httpCode).send({code: error.errCode})
+        res.status(400).send({code: "Wrong Request"});
+        console.log(error);
     });
 });
 

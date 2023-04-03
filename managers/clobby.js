@@ -113,7 +113,6 @@ const lobbyingManager = {
                     arrDates.push($(date).text());
                 });
 
-                // console.log(arrPoliticians.length);
                 arrPoliticians.forEach((element, index) => {
                     let temp = {};
                     temp['politician'] = arrPoliticians[index]
@@ -124,7 +123,6 @@ const lobbyingManager = {
                     relevantTradesForBill.push(temp);
                 });
                 arrRelevantTrades.push(relevantTradesForBill);
-                // console.log('------ [] Bill break [] ------'); // Se agrega entonces al arreglo al arreglo de relevant trades
 
             });
 
@@ -139,10 +137,8 @@ const lobbyingManager = {
                 responseObject['lobbists'] = arrLobbists[index];
                 responseObject['relevant_trades'] = arrRelevantTrades[index];
 
-                // console.log(responseObject);
                 responseList.push(responseObject);
             });
-
             console.log(responseList);
             return responseList;
 
@@ -154,21 +150,17 @@ const lobbyingManager = {
                         resolve(cheerio.load(body));
                     } else {
                         reject(error);
+                        console.log(error)
                     }
                 });
             });
 
-            const firm = [];
-            const firmUrl = [];
-            const client = [];
-            const clientUrl = [];
-            const contractAmount = [];
-
             /*
-             *   Firms
+             *   Firms, clients & Contract Amounts
              */
 
             const firms = $('table tr');
+            const information = [];
             firms.each((i, row) => {
 
                 let rowObject = {};
@@ -194,19 +186,10 @@ const lobbyingManager = {
                     rowObject['amount'] = text;
                     
                 });
-                console.log(rowObject);
-                console.log('------ break --------');
+                information.push(rowObject);
             });
-
-
-            /*
-             *   Clients
-             */
-
-            /*
-             *   Contracts 
-             */
-
+            console.log(information)
+            return information
 
         }
 
