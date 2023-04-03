@@ -1,10 +1,11 @@
 const cheerio = require('cheerio');
+const { sign } = require('crypto');
 const request = require('request');
 
 const lobbyingManager = {
 
 
-    fetch: async (type) => {
+    fetch: async (type, cycle = 'a') => {
 
         if (type === "RC-1") {
             const responseList = [];
@@ -147,7 +148,66 @@ const lobbyingManager = {
 
         }
         if (type === "RC-2") {
-            console.log("RC-2 underperformed");
+            let $ = await new Promise((resolve, reject) => {
+                request(`https://www.opensecrets.org/federal-lobbying/top-contracts?cycle=${cycle}`, (error, response, body) => {
+                    if (!error && response.statusCode == 200) {
+                        resolve(cheerio.load(body));
+                    } else {
+                        reject(error);
+                    }
+                });
+            });
+
+            const firm = [];
+            const firmUrl = [];
+            const client = [];
+            const clientUrl = [];
+            const contractAmount = [];
+
+            /*
+             *   Firms
+             */
+
+            const firms = $('table tr');
+            firms.each((i, row) => {
+
+                let rowObject = {};
+                const tableCells = $(row).find('td');
+
+                let signaler = 0; 
+
+                tableCells.each((j, cell) => {
+
+                    const href = $(cell).find('a').attr('href');
+                    const text = $(cell).text();
+
+                    if( signaler === 0 && typeof href !== 'undefined'){
+                        rowObject['firm'] = text;
+                        rowObject['firmUrl'] = href
+                        signaler += 1;
+                    }
+                    
+                    if( signaler === 1 && typeof href !== 'undefined'){
+                        rowObject['client'] = text;
+                        rowObject['clientUrl'] = href
+                    }
+                    rowObject['amount'] = text;
+                    
+                });
+                console.log(rowObject);
+                console.log('------ break --------');
+            });
+
+
+            /*
+             *   Clients
+             */
+
+            /*
+             *   Contracts 
+             */
+
+
         }
 
 
